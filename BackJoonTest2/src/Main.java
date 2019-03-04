@@ -1,67 +1,39 @@
 import java.util.Scanner;
 
-public class Main {
+public class Main {	// A번 계란으로 계란치기
 	static int n;
-	static int m;
-	static int[] dx= {0,0,-1,1};
-	static int[] dy= {-1,1,0,0};
+	static int max=0;
 	public static void main(String[] args) {
 		Scanner sc=new Scanner(System.in);
 		n=sc.nextInt();
-		m=sc.nextInt();
-		int[][] arr=new int[n][m];
-		boolean[][][][] visit=new boolean[20][20][20][20];
+		int[][] egg=new int[n][2];
 		for(int i=0;i<n;i++) {
-			for(int j=0;j<m;j++) {
-				arr[i][j]=sc.nextInt();
-			}
+			egg[i][0]=sc.nextInt();
+			egg[i][1]=sc.nextInt();
 		}
-		int max=go(arr,0);
+		boolean[] chk=new boolean[n];
+		go(0,egg,0,chk);
 		System.out.println(max);
 	}
-	public static int go(int[][] arr,int count) {
-		if(count==2) {
-			int num=search(arr);
-			return num;
+	public static void go(int index,int[][] egg,int count,boolean[] chk) {
+		if(index==n-1) {
+			
 		}
-		int max=0;
+		if(egg[index][0]<0) return;
+		chk[index]=true;
 		for(int i=0;i<n;i++) {
-			for(int j=0;j<m;j++) {
-				if(arr[i][j]!=0) continue;
-				arr[i][j]=1;
-				int temp=go(arr,count+1);
-				max=max>temp?max:temp;
-				arr[i][j]=0;
-			}
+			if(egg[i][0]<0) continue;
+			int[][] tegg=new int[n][2];
+			clone(egg,tegg);
+			tegg[i][0]-=egg[index][1];
+			tegg[index][0]-=egg[i][1];
+			go(index+1,tegg,count+1,chk);
 		}
-		return max;
 	}
-	public static int search(int[][] arr) {
-		boolean[][] visit=new boolean[n][m];
-		int sum=0;
+	public static void clone(int[][] egg, int[][] tegg) {
 		for(int i=0;i<n;i++) {
-			for(int j=0;j<m;j++) {
-				if(arr[i][j]!=2||visit[i][j]) continue;
-				visit[i][j]=true;
-				sum+=dfs(i,j,arr,visit,1);
-			}
+			tegg[i][0]=egg[i][0];
+			tegg[i][1]=egg[i][1];
 		}
-		return sum;
-	}
-	public static int dfs(int i, int j,int[][] arr,boolean[][] visit,int count) {
-		boolean flag=true;
-		int t=count;
-		for(int d=0;d<4;d++) {
-			int x=j+dx[d];
-			int y=i+dy[d];
-			if(x<0||x>=m||y<0||y>=n) continue;
-			if(arr[y][x]==0) flag=false;
-			if(arr[y][x]==2&&!visit[y][x]) {
-				visit[y][x]=true;
-				t=dfs(y,x,arr,visit,t+1);
-			}
-		}
-		if(!flag) return 0;
-		return t;
 	}
 }
