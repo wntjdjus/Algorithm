@@ -1,136 +1,128 @@
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Scanner;
 
-public class Main {	// bj16985 Maaaaaaaaaze
-	static int[][][] input;
-	static int[] dz= {-1,1,0,0,0,0};
-	static int[] dy= {0,0,-1,1,0,0};
-	static int[] dx= {0,0,0,0,-1,1};
-	static boolean[] useZ;
-	static int min=Integer.MAX_VALUE;
-	static int c=0;
-	
+public class Main {	// 16986번 인싸들의 가위바위보
+	static int n;
+	static int k;
+	static int[][] match;
+	static int[][] player;
 	public static void main(String[] args) {
 		Scanner sc=new Scanner(System.in);
-		input=new int[5][5][5];
-		useZ=new boolean[5];
-		for(int k=0;k<5;k++) {
-			for(int i=0;i<5;i++) {
-				for(int j=0;j<5;j++) {
-					input[k][i][j]=sc.nextInt();
+		n=sc.nextInt();
+		k=sc.nextInt();
+		match=new int[n+1][n+1];
+		for(int i=1;i<=n;i++) {
+			for(int j=1;j<=n;j++) {
+				match[i][j]=sc.nextInt();
+			}
+		}
+		player=new int[3][20];
+		int[] win=new int[3];
+		for(int i=1;i<3;i++) {
+			for(int j=0;j<20;j++) {
+				player[i][j]=sc.nextInt();
+			}
+		}
+		boolean[] input=new boolean[n+1];
+		if(go(win,input,0,0,1,0,0)) System.out.println(1);
+		else System.out.println(0);
+	}
+	public static boolean go(int[] win,boolean[] input, int count, int winner, int no, int index1, int index2) {
+		int[] twin;
+		if(win[winner]==k) {
+			if(winner==0) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		if(count>=n) {
+			return false;
+		}
+		int front=0;
+		int rear=0;
+		if(winner==0&&no==1 || winner==1&&no==0) {
+			for(int i=1;i<=n;i++) {
+				if(input[i]) continue;
+				input[i]=true;
+				front=i;
+				rear=player[1][index1];
+				if(match[front][rear]==0) {
+					twin=new int[3];
+					clone(win,twin);
+					twin[1]++;
+					if(go(twin,input,count+1,1,2,index1+1,index2)) return true;
 				}
-			}
-		}
-		int[][][] cube=new int[5][5][5];
-		go(cube,0);
-		if(min==Integer.MAX_VALUE) System.out.println(-1);
-		else System.out.println(min);
-		System.out.println("큐브개수:"+c);
-	}
-	public static void go(int[][][] cube,int height) {
-		if(height==5) {
-			c++;
-			bfs(cube,0,0,0);
-			bfs(cube,0,0,4);
-			bfs(cube,0,4,0);
-			bfs(cube,0,4,4);
-			return;
-		}
-		for(int k=0;k<5;k++) {
-			if(useZ[k]) continue;
-			useZ[k]=true;
-			int[][] tarr=new int[5][5];
-			clone32(input,tarr,k);
-			for(int r=0;r<4;r++) {
-				int[][][] tcube=new int[5][5][5];
-				clone3(cube,tcube);
- 				tarr=rotate(tarr);
-				clone2(tarr,tcube,height);
-				go(tcube,height+1);
-			}
-			useZ[k]=false;
-		}
-	}
-	public static void print(int[][][] arr) {
-		for(int k=0;k<5;k++) {
-			for(int i=0;i<5;i++) {
-				for(int j=0;j<5;j++) {
-					System.out.print(arr[k][i][j]+" ");
+				else if(match[front][rear]==1) {
+					twin=new int[3];
+					clone(win,twin);
+					twin[1]++;
+					if(go(twin,input,count+1,1,2,index1+1,index2)) return true;
 				}
-				System.out.println();
-			}
-			System.out.println();
-		}
-		System.out.println("=============================");
-	}
-	public static int[][] rotate(int[][] arr) {
-		int[][] tarr=new int[5][5];
-		for(int i=0;i<5;i++) {
-			for(int j=0;j<5;j++) {
-				tarr[j][4-i]=arr[i][j];
-			}
-		}
-		return tarr;
-	}
-	public static void bfs(int[][][] cube,int a,int b,int c) {
-//		System.out.println("bfs시작");
-		boolean[][][] visit=new boolean[5][5][5];
-		Queue<int[]> q=new LinkedList<int[]>();
-		int[] start= {a,b,c,0};
-		System.out.println(a+" "+b+" "+c);
-		visit[a][b][c]=true;
-		q.add(start);
-		while(!q.isEmpty()) {
-			int[] temp=q.remove();
-//			System.out.println(temp[0]+" "+temp[1]+" "+temp[2]);
-			int z=temp[0];
-			int y=temp[1];
-			int x=temp[2];
-			int length=temp[3];
-			if((z==4-a)&&(y==4-b)&&(x==4-c)) {
-				System.out.println("IN");
-				min=min<length?min:length;
-				return;
-			}
-			for(int d=0;d<6;d++) {
-				int tz=z+dz[d];
-				int ty=y+dy[d];
-				int tx=x+dx[d];
-				if(tz<0||tz>=5||ty<0||ty>=5||tx<0||tx>=5) continue;
-				if(tz!=0&&tz!=4&&ty!=0&&ty!=4&&tx!=0&&tx!=4) continue;
-				if(cube[tz][ty][tx]==0) continue;
-				if(visit[tz][ty][tx]) continue;
-				visit[tz][ty][tx]=true;
-				int[] next= {tz,ty,tx,length+1};
-				q.add(next);
-			}
-		}
-		return;
-	}
-	public static void clone3(int[][][] arr, int[][][] tarr) {
-		for(int k=0;k<5;k++) {
-			for(int i=0;i<5;i++) {
-				for(int j=0;j<5;j++) {
-					tarr[k][i][j]=arr[k][i][j];
+				else {
+					twin=new int[3];
+					clone(win,twin);
+					twin[0]++;
+					if(go(twin,input,count+1,0,2,index1+1,index2)) return true;
 				}
+				input[i]=false;
 			}
 		}
-	}
-	public static void clone2(int[][] arr, int[][][] tarr, int height) {
-		for(int i=0;i<5;i++) {
-			for(int j=0;j<5;j++) {
-				tarr[height][i][j]=arr[i][j];
+		else if(winner==0&&no==2 || winner==2&&no==0) {
+			for(int i=1;i<=n;i++) {
+				if(input[i]) continue;
+				input[i]=true;
+				front=i;
+				rear=player[2][index2];
+				if(match[front][rear]==0) {
+					twin=new int[3];
+					clone(win,twin);
+					twin[2]++;
+					if(go(twin,input,count+1,2,1,index1,index2+1)) return true;
+				}
+				else if(match[front][rear]==1) {
+					int big=winner>no?winner:no;
+					twin=new int[3];
+					clone(win,twin);
+					twin[2]++;
+					if(go(twin,input,count+1,2,1,index1,index2+1)) return true;
+				}
+				else {
+					twin=new int[3];
+					clone(win,twin);
+					twin[0]++;
+					if(go(twin,input,count+1,0,1,index1,index2+1)) return true;
+				}
+				input[i]=false;
 			}
 		}
-	}
-	public static void clone32(int[][][] arr, int[][] tarr, int height) {
-		for(int i=0;i<5;i++) {
-			for(int j=0;j<5;j++) {
-				tarr[i][j]=arr[height][i][j];
+		else if(winner==1&&no==2||winner==2&&no==1) {
+			front=player[1][index1];
+			rear=player[2][index2];
+			if(match[front][rear]==0) {
+				twin=new int[3];
+				clone(win,twin);
+				twin[2]++;
+				if(go(twin,input,count,2,0,index1+1,index2+1)) return true;
 			}
+			else if(match[front][rear]==1) {
+				twin=new int[3];
+				clone(win,twin);
+				twin[2]++;
+				if(go(twin,input,count,2,0,index1+1,index2+1)) return true;
+			}
+			else {
+				twin=new int[3];
+				clone(win,twin);
+				twin[1]++;
+				if(go(twin,input,count,1,0,index1+1,index2+1)) return true;
+			}
+		}
+		return false;
+	}
+	public static void clone(int[] arr, int[] tarr) {
+		for(int i=0;i<3;i++) {
+			tarr[i]=arr[i];
 		}
 	}
 }
