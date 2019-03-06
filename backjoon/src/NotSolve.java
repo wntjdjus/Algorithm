@@ -2,7 +2,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 
-public class Main {	// bj16236 아기 상어
+public class NotSolve {	// bj16236 아기 상어
 	/*
 	 * 0 빈칸
 	 * 1~6 물고기 크기
