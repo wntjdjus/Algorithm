@@ -2,7 +2,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 
-public class NotSolve {	// bj16236 아기 상어
+public class bj16236 {	// bj16236 아기 상어
 	/*
 	 * 0 빈칸
 	 * 1~6 물고기 크기
@@ -37,7 +37,7 @@ public class NotSolve {	// bj16236 아기 상어
 		int eat=0;
 		while(true) {
 			int[] temp=bfs(arr,y,x);
-			if(temp[2]==-1) return time;
+			if(temp[2]==0) return time;
 			arr[y][x]=0;
 			arr[temp[0]][temp[1]]=9;
 			time+=temp[2];
@@ -51,6 +51,10 @@ public class NotSolve {	// bj16236 아기 상어
 		}
 	}
 	public static int[] bfs(int[][] arr,int a,int b) {
+		int[] result=new int[3];
+		result[0]=n;
+		result[1]=n;
+		int max=Integer.MAX_VALUE;
 		Queue<int[]> q=new LinkedList<int[]>();
 		boolean[][] chk=new boolean[n][n];
 		int[] start= {a,b,0};
@@ -60,6 +64,7 @@ public class NotSolve {	// bj16236 아기 상어
 			int[] temp=q.remove();
 			int y=temp[0];
 			int x=temp[1];
+			if(temp[2]>=max) break;
 			for(int d=0;d<4;d++) {
 				int ty=y+dy[d];
 				int tx=x+dx[d];
@@ -67,15 +72,19 @@ public class NotSolve {	// bj16236 아기 상어
 				if(chk[ty][tx]) continue;
 				if(arr[ty][tx]>level) continue;
 				else if(arr[ty][tx]<level&&arr[ty][tx]>0) {
-					int[] k= {ty,tx,temp[2]+1};
-					return k;
+					if(ty<result[0]|| ty==result[0]&&tx<result[1]) {
+						result[0]=ty;
+						result[1]=tx;
+						result[2]=temp[2]+1;
+						max=result[2];
+					}
+					continue;
 				}
 				chk[ty][x]=true;
 				int[] next= {ty,tx,temp[2]+1};
 				q.add(next);
 			}
 		}
-		int[] error= {-1,-1,-1};
-		return error;
+		return result;
 	}
 }
