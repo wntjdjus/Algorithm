@@ -1,3 +1,3 @@
-#Algorithm
+# Algorithm
 
-##BackJoon (acmicpc.net)
+## BackJoon (acmicpc.net)
